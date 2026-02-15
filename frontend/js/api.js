@@ -1,15 +1,17 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const api = {
-    async request(endpoint, method = 'GET', data = null) {
-        const token = localStorage.getItem('adminToken');
-        const headers = { 'Content-Type': 'application/json' };
+    async request(endpoint, method = 'GET', data = null, customHeaders = {}) {
+        const token = localStorage.getItem('adminToken') || localStorage.getItem('prepstack_token');
+        const headers = { 'Content-Type': 'application/json', ...customHeaders };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const options = { method, headers };
         if (data) options.body = JSON.stringify(data);
 
-        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+        const res = await fetch(`${API_BASE}${path}`, options);
         return handleResponse(res);
     },
     get(endpoint) {
@@ -23,6 +25,21 @@ const api = {
     },
     delete(endpoint) {
         return this.request(endpoint, 'DELETE');
+    },
+    // Add file upload support if needed, bypassing JSON content type
+    async upload(endpoint, formData) {
+        const token = localStorage.getItem('adminToken');
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+        const res = await fetch(`${API_BASE}${path}`, {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+        return handleResponse(res);
     }
 };
 
