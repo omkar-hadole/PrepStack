@@ -5,9 +5,13 @@ import { OAuth2Client } from 'google-auth-library';
 import { Admin, User } from '../models/index.js';
 import 'dotenv/config';
 
+import connectDB from '../db.js';
+
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
+    await connectDB();
+    console.log("Admin Login route hit");
     const { username, password } = req.body;
 
     try {
@@ -20,11 +24,13 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ _id: admin._id, username: admin.username }, process.env.JWT_SECRET, { expiresIn: '8h' });
         res.json({ token });
     } catch (err) {
+        console.error("Login Error:", err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
 router.post('/init', async (req, res) => {
+    await connectDB();
     const count = await Admin.countDocuments();
     if (count > 0) return res.status(403).json({ error: 'Admin already initialized' });
 
@@ -41,6 +47,7 @@ router.post('/init', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
+    await connectDB();
     try {
         const { name, email, password } = req.body;
         if (!name || !email || !password) return res.status(400).json({ error: 'All fields are required' });
@@ -62,6 +69,8 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/user/login', async (req, res) => {
+    await connectDB();
+    console.log("User Login route hit");
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -75,6 +84,7 @@ router.post('/user/login', async (req, res) => {
         const token = jwt.sign({ _id: user._id, name: user.name, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { _id: user._id, name: user.name, email: user.email } });
     } catch (err) {
+        console.error("User Login Error:", err);
         res.status(500).json({ error: err.message });
     }
 });

@@ -11,8 +11,17 @@ import connectDB from "../db.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ["https://prep-stack-nst.vercel.app", "http://localhost:5173", "https://prep-stack-dyxuz9r4n-omkarhadoles-projects.vercel.app"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
+
+// Handle Preflight Requests explicitly
+app.options('*', cors());
 
 // Set headers for Google Auth (COOP/COEP)
 app.use((req, res, next) => {
@@ -21,7 +30,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Connect to DB immediately
+// Connect to DB immediately (start the promise)
 connectDB();
 
 // Mount Routes
