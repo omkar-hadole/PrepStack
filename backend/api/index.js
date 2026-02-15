@@ -10,6 +10,7 @@ import attemptRoutes from "../routes/attempts.js";
 import connectDB from "../db.js";
 
 const app = express();
+console.log("Initializing Backend Function...");
 
 app.use(cors({
     origin: ["https://prep-stack-nst.vercel.app", "http://localhost:5173", "https://prep-stack-dyxuz9r4n-omkarhadoles-projects.vercel.app"],
