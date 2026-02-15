@@ -1,4 +1,7 @@
-const API_HOST = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL;
+
+// Debug Log for Production Verification
+console.log("ENV VITE_API_URL:", API_BASE);
 
 const api = {
     async request(endpoint, method = 'GET', data = null, customHeaders = {}) {
@@ -12,9 +15,9 @@ const api = {
         // Ensure endpoint starts with /
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
-        // Construct full URL: HOST + /api + endpoint
+        // Construct full URL strictly: BASE + /api + endpoint
         // Example: https://prep-stack-backend.vercel.app/api/auth/user/login
-        const url = `${API_HOST}/api${path}`;
+        const url = `${API_BASE}/api${path}`;
 
         try {
             const res = await fetch(url, options);
@@ -37,14 +40,14 @@ const api = {
     delete(endpoint) {
         return this.request(endpoint, 'DELETE');
     },
-    
+
     async upload(endpoint, formData) {
         const token = localStorage.getItem('adminToken');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        const url = `${API_HOST}/api${path}`;
+        const url = `${API_BASE}/api${path}`;
 
         try {
             const res = await fetch(url, {

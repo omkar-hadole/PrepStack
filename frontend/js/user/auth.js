@@ -98,6 +98,7 @@ export default function renderAuth(params, root) {
             const endpoint = isRegister ? '/auth/register' : '/auth/user/login';
             const payload = isRegister ? { name, email, password } : { email, password };
 
+            console.log('ENV VITE_API_URL:', import.meta.env.VITE_API_URL);
             console.log('LOGIN URL:', `${import.meta.env.VITE_API_URL}/api${endpoint}`);
             console.log('Payload:', payload);
 
