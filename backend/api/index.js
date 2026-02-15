@@ -47,11 +47,25 @@ app.use("/api", attemptRoutes);   // Note: Check mounting point. Original app.js
 
 // Test Route
 app.get("/api/test", (req, res) => {
-    res.json({ message: "Backend working" });
+    res.json({ message: "Backend working", url: req.url });
 });
 
 app.get('/', (req, res) => {
     res.send("PrepStack Backend Running");
+});
+
+// Debug Catch-All for 404s to inspect routing
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Route not found",
+        debug: {
+            url: req.url,
+            originalUrl: req.originalUrl,
+            method: req.method,
+            path: req.path,
+            baseUrl: req.baseUrl
+        }
+    });
 });
 
 export default serverless(app);
