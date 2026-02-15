@@ -1,8 +1,11 @@
-const express = require('express');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
+import { Admin, User } from '../models/index.js';
+import 'dotenv/config';
+
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { Admin } = require('../models');
 
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -42,13 +45,13 @@ router.post('/register', async (req, res) => {
         const { name, email, password } = req.body;
         if (!name || !email || !password) return res.status(400).json({ error: 'All fields are required' });
 
-        const existingUser = await require('../models').User.findOne({ email });
+        const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        const user = new require('../models').User({ name, email, passwordHash });
+        const user = new User({ name, email, passwordHash });
         await user.save();
 
         const token = jwt.sign({ _id: user._id, name: user.name, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -57,10 +60,10 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 router.post('/user/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const User = require('../models').User;
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
@@ -75,7 +78,7 @@ router.post('/user/login', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-const { OAuth2Client } = require('google-auth-library');
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/google', async (req, res) => {
@@ -88,10 +91,10 @@ router.post('/google', async (req, res) => {
         const payload = ticket.getPayload();
         const { email, name, sub: googleId } = payload;
 
-        let user = await require('../models').User.findOne({ email });
+        let user = await User.findOne({ email });
 
         if (!user) {
-            user = new require('../models').User({
+            user = new User({
                 name: name || email.split('@')[0] || 'User',
                 email,
                 googleId
@@ -110,4 +113,4 @@ router.post('/google', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

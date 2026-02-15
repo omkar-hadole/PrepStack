@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import 'dotenv/config';
 
 let cached = global.mongoose;
 
@@ -23,6 +24,7 @@ async function connectDB() {
 
     try {
         cached.conn = await cached.promise;
+        console.log('MongoDB Connected');
     } catch (e) {
         cached.promise = null;
         throw e;
@@ -31,4 +33,4 @@ async function connectDB() {
     return cached.conn;
 }
 
-module.exports = connectDB;
+export default connectDB;

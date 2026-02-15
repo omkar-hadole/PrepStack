@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const SemesterSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true },
@@ -59,12 +59,20 @@ const UserSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = {
-    Semester: mongoose.model('Semester', SemesterSchema),
-    Subject: mongoose.model('Subject', SubjectSchema),
-    Quiz: mongoose.model('Quiz', QuizSchema),
-    Question: mongoose.model('Question', QuestionSchema),
-    Attempt: mongoose.model('Attempt', AttemptSchema),
-    Admin: mongoose.model('Admin', AdminSchema),
-    User: mongoose.model('User', UserSchema)
+export const Semester = mongoose.model('Semester', SemesterSchema);
+export const Subject = mongoose.model('Subject', SubjectSchema);
+export const Quiz = mongoose.model('Quiz', QuizSchema);
+export const Question = mongoose.model('Question', QuestionSchema);
+export const Attempt = mongoose.model('Attempt', AttemptSchema);
+export const Admin = mongoose.model('Admin', AdminSchema);
+export const User = mongoose.model('User', UserSchema);
+
+export default {
+    Semester,
+    Subject,
+    Quiz,
+    Question,
+    Attempt,
+    Admin,
+    User
 };
