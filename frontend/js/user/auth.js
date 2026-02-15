@@ -37,7 +37,7 @@ export default function renderAuth(params, root) {
                     </div>
 
                     <div id="g_id_onload"
-                        data-client_id="416870163341-hj1a2eg9rktap9gsjn64dojeq95vu7ak.apps.googleusercontent.com"
+                        data-client_id="${import.meta.env.VITE_GOOGLE_CLIENT_ID}"
                         data-context="signup"
                         data-ux_mode="popup"
                         data-callback="handleGoogleCredentialResponse"
@@ -66,7 +66,7 @@ export default function renderAuth(params, root) {
         </div>
     `;
 
-    
+
     if (!document.getElementById('google-client-script')) {
         const script = document.createElement('script');
         script.src = "https://accounts.google.com/gsi/client";
@@ -76,7 +76,7 @@ export default function renderAuth(params, root) {
         document.body.appendChild(script);
     }
 
-    
+
     window.handleGoogleCredentialResponse = async (response) => {
         try {
             const data = await api.post('/auth/google', { credential: response.credential });
@@ -101,7 +101,7 @@ export default function renderAuth(params, root) {
             const data = await api.post(endpoint, payload);
 
             localStorage.setItem('prepstack_token', data.token);
-            localStorage.setItem('prepstack_user', JSON.stringify(data.user)); 
+            localStorage.setItem('prepstack_user', JSON.stringify(data.user));
 
             window.router.navigate('/courses');
         } catch (err) {
