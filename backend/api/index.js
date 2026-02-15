@@ -12,6 +12,7 @@ import connectDB from "../db.js";
 const app = express();
 console.log("Initializing Backend Function...");
 
+// Middleware
 app.use(cors({
     origin: ["https://prep-stack-nst.vercel.app", "http://localhost:5173", "https://prep-stack-dyxuz9r4n-omkarhadoles-projects.vercel.app"],
     credentials: true,
@@ -21,20 +22,17 @@ app.use(cors({
 
 app.use(express.json());
 
-// Handle Preflight Requests
-app.options('*', cors());
-
-// Set headers for Google Auth (COOP/COEP)
-app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-    next();
-});
+// Remove restrictive COOP/COEP headers for now to fix Google Sign-In interaction
+// app.use((req, res, next) => {
+//     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+//     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+//     next();
+// });
 
 // Connect to DB immediately
 connectDB();
 
-// Mount Routes EXACTLY as requested
+// Mount Routes EXACTLY
 app.use("/api/auth", authRoutes);
 app.use("/api", hierarchyRoutes);
 app.use("/api", questionsRoutes);
