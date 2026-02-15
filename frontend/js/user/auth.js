@@ -98,6 +98,9 @@ export default function renderAuth(params, root) {
             const endpoint = isRegister ? '/auth/register' : '/auth/user/login';
             const payload = isRegister ? { name, email, password } : { email, password };
 
+            console.log('LOGIN URL:', `${import.meta.env.VITE_API_URL}/api${endpoint}`);
+            console.log('Payload:', payload);
+
             const data = await api.post(endpoint, payload);
 
             localStorage.setItem('prepstack_token', data.token);

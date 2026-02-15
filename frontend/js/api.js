@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_HOST = import.meta.env.VITE_API_URL;
 
 const api = {
     async request(endpoint, method = 'GET', data = null, customHeaders = {}) {
@@ -9,10 +9,21 @@ const api = {
         const options = { method, headers };
         if (data) options.body = JSON.stringify(data);
 
+        // Ensure endpoint starts with /
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
-        const res = await fetch(`${API_BASE}${path}`, options);
-        return handleResponse(res);
+        // Construct full URL: HOST + /api + endpoint
+        // Example: https://prep-stack-backend.vercel.app/api/auth/user/login
+        const url = `${API_HOST}/api${path}`;
+
+        try {
+            const res = await fetch(url, options);
+            return handleResponse(res);
+        } catch (err) {
+            console.error('API Request Failed:', err);
+            // If it's a network error (like CORS or offline), throw it.
+            throw new Error('Network error or server unreachable');
+        }
     },
     get(endpoint) {
         return this.request(endpoint);
@@ -26,20 +37,26 @@ const api = {
     delete(endpoint) {
         return this.request(endpoint, 'DELETE');
     },
-    // Add file upload support if needed, bypassing JSON content type
+    
     async upload(endpoint, formData) {
         const token = localStorage.getItem('adminToken');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        const url = `${API_HOST}/api${path}`;
 
-        const res = await fetch(`${API_BASE}${path}`, {
-            method: 'POST',
-            headers,
-            body: formData
-        });
-        return handleResponse(res);
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: formData
+            });
+            return handleResponse(res);
+        } catch (err) {
+            console.error('API Upload Failed:', err);
+            throw new Error('Network error or server unreachable');
+        }
     }
 };
 
