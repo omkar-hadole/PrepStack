@@ -5,10 +5,23 @@ import mongoose from 'mongoose';
 const router = express.Router();
 
 router.post('/start', async (req, res) => {
-    const { quizId, userId } = req.body;
-    const attempt = new Attempt({ quizId, userId, startTime: new Date() });
-    await attempt.save();
-    res.json(attempt);
+    try {
+        const { quizId, userId } = req.body;
+        const attempt = new Attempt({ quizId, userId, startTime: new Date() });
+        await attempt.save();
+
+        const quiz = await mongoose.model('Quiz').findById(quizId).lean();
+        const questions = await mongoose.model('Question').find({ quizId }).sort({ order: 1 }).lean();
+
+        res.json({
+            attemptId: attempt._id,
+            quiz,
+            questions,
+            startTime: attempt.startTime
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 router.post('/:id/submit', async (req, res) => {
