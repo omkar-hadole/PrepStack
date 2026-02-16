@@ -92,7 +92,7 @@ router.get('/:id', async (req, res) => {
         // Attach user answers to questions for the frontend
         const questionsWithAnswers = questions.map(q => ({
             ...q,
-            userAnswer: attempt.answers[q._id.toString()]
+            userAnswer: (attempt.answers || {})[q._id.toString()]
         }));
 
         res.json({

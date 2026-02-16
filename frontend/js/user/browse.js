@@ -154,7 +154,7 @@ async function renderQuizzesWithControls(root, subjectId) {
                 return {
                     ...q,
                     isAttempted: !!attempt,
-                    latestScore: attempt ? attempt.score : null,
+                    latestScore: attempt && attempt.score !== undefined ? attempt.score : (attempt ? 0 : null),
                     lastAttemptId: attempt ? attempt._id : null
                 };
             });
