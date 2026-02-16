@@ -150,7 +150,14 @@ async function renderQuizzesWithControls(root, subjectId) {
             }
 
             const quizzesWithProgress = quizzes.map(q => {
-                const attempt = attempts.find(a => a.quizId._id === q._id || a.quizId === q._id);
+                // Find all attempts for this quiz
+                const quizAttempts = attempts.filter(a => (a.quizId._id || a.quizId) === q._id);
+
+                // Sort by date descending (latest first)
+                quizAttempts.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
+                const attempt = quizAttempts[0]; // Get the latest one
+
                 return {
                     ...q,
                     isAttempted: !!attempt,
