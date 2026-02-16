@@ -101,7 +101,7 @@ function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
         root.innerHTML = '<div class="container mt-4">Submitting answers...</div>';
         try {
             const res = await api.post(`/attempts/${attemptId}/submit`, { answers });
-            renderResult(root, res, attemptId);
+            renderResult(root, res, attemptId, quizInfo.subjectId);
         } catch (err) {
             root.innerHTML = `<div class="container margin-top"><p style="color:red">Submission Failed: ${err.message}</p> <button class="btn btn-secondary" onclick="window.location.reload()">Retry</button></div>`;
         }
@@ -421,7 +421,7 @@ function bindInputs(index, q, answers, reviewStatus, onChange) {
     }
 }
 
-function renderResult(root, result, attemptId) {
+function renderResult(root, result, attemptId, subjectId) {
     root.innerHTML = `
         <div class="container mt-4 text-center" style="max-width: 600px;">
             <div class="card" style="padding: 3rem;">
@@ -432,7 +432,7 @@ function renderResult(root, result, attemptId) {
                 <p class="text-muted mb-4">Completed at ${new Date(result.completedAt).toLocaleString()}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                     <button id="review-btn" class="btn btn-secondary">Review Answers</button>
-                    <a href="/courses" class="btn btn-primary" data-link>Back to Courses</a>
+                    <button class="btn btn-primary" onclick="window.router.navigate('/courses?view=quizzes&id=${subjectId}')">Back to Quiz List</button>
                 </div>
             </div>
         </div>
