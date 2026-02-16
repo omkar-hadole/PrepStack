@@ -1,5 +1,6 @@
 import api from '/js/utils/api.js';
 import { Cache } from '/js/utils/cache.js';
+import { Skeleton } from '/js/components/Skeleton.js';
 
 const QUIZZES_PER_PAGE = 6;
 
@@ -16,7 +17,15 @@ export default async function renderBrowse(params, root) {
             console.log(`[Cache Hit] Rendering ${key} instantly`);
             renderFn(root, cached);
         } else {
-            root.innerHTML = '<div class="container mt-4">Loading...</div>';
+            // Show Skeleton Loading
+            root.innerHTML = `
+                <div class="container mt-4">
+                    <div class="skeleton skeleton-text" style="width: 200px; height: 2rem; margin-bottom: 2rem;"></div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+                        ${Skeleton.card(6)}
+                    </div>
+                </div>
+            `;
         }
 
         try {
@@ -141,7 +150,12 @@ async function renderQuizzesWithControls(root, subjectId) {
 
     const fetchAndRender = async () => {
         const container = document.getElementById('quiz-list-container');
-        container.innerHTML = '<p>Loading...</p>';
+        // Show Skeleton List
+        container.innerHTML = `
+            <div style="display: grid; gap: 1rem;">
+                ${Skeleton.list(3)}
+            </div>
+        `;
         document.getElementById('pagination-controls').innerHTML = ''; // Clear pagination while loading
 
         try {
