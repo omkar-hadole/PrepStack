@@ -25,7 +25,7 @@ export const ProgressBar = {
         if (!this.element) this.init();
         this.element.style.opacity = '1';
         this.element.style.width = '30%';
-        this.element.style.transition = 'width 10s cubic-bezier(0.1, 0.5, 0.1, 0.1)'; 
+        this.element.style.transition = 'width 10s cubic-bezier(0.1, 0.5, 0.1, 0.1)'; // Slow trickle
     },
 
     finish() {
