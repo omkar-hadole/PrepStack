@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://prep-stack-backend.vercel.app";
+const API_BASE = (import.meta.env.VITE_API_URL || "https://prep-stack-backend.vercel.app").replace(/\/$/, '');
 
 // Debug Log for Production Verification
 console.log("ENV VITE_API_URL:", API_BASE);

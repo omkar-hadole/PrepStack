@@ -14,7 +14,7 @@ console.log("Initializing Backend Function...");
 
 // Middleware
 app.use(cors({
-    origin: ["https://prep-stack-nst.vercel.app", "http://localhost:5173", "https://prep-stack-dyxuz9r4n-omkarhadoles-projects.vercel.app"],
+    origin: ["https://prep-stack-nst.vercel.app", "http://localhost:5173", "https://prep-stack-dyxuz9r4n-omkarhadoles-projects.vercel.app", "http://127.0.0.1:5173", "http://localhost:5174"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -62,4 +62,5 @@ app.use((req, res) => {
     });
 });
 
+export { app };
 export default serverless(app);
