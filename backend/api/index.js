@@ -23,11 +23,11 @@ app.use(cors({
 app.use(express.json());
 
 // Remove restrictive COOP/COEP headers for now to fix Google Sign-In interaction
-// app.use((req, res, next) => {
-//     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-//     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-//     next();
-// });
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    next();
+});
 
 // Connect to DB immediately
 connectDB();
