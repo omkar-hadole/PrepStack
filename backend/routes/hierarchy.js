@@ -70,6 +70,16 @@ router.post('/subjects', async (req, res) => {
     }
 });
 
+router.get('/subjects/:id', async (req, res) => {
+    try {
+        const subject = await Subject.findById(req.params.id).lean();
+        if (!subject) return res.status(404).json({ error: 'Subject not found' });
+        res.json(subject);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/quizzes', async (req, res) => {
     try {
         const { subjectId, userId, semesterId, search, page = 1, limit = 10, sort } = req.query;

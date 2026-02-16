@@ -50,11 +50,12 @@ export default async function renderBrowse(params, root) {
 }
 
 
-function renderHeader(title, showBack = false) {
+function renderHeader(title, showBack = false, backUrl = null) {
+    const backAction = backUrl ? `window.router.navigate('${backUrl}')` : `window.history.back()`;
     return `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div style="display: flex; gap: 1rem; align-items: center;">
-                ${showBack ? '<button class="btn btn-secondary" onclick="window.history.back()">← Back</button>' : ''}
+                ${showBack ? `<button class="btn btn-secondary" onclick="${backAction}">← Back</button>` : ''}
                 <h2 class="mb-0">${title}</h2>
             </div>
             <button class="btn btn-outline-danger btn-sm" onclick="localStorage.clear(); window.router.navigate('/login')">Logout</button>
@@ -83,7 +84,7 @@ function renderSemesters(root, list) {
 function renderSubjects(root, list) {
     root.innerHTML = `
     <div class="container mt-4">
-            ${renderHeader('Select Subject', true)}
+            ${renderHeader('Select Subject', true, '/courses?view=semesters')}
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
                 ${list.length === 0 ? '<p>No subjects found.</p>' : ''}
                 ${list.map(item => `
@@ -109,10 +110,21 @@ async function renderQuizzesWithControls(root, subjectId) {
         totalPages: 1
     };
 
+    // Fetch Subject Details for Breadcrumb/Back Navigation
+    let subject = null;
+    try {
+        subject = await api.get(`/subjects/${subjectId}`);
+    } catch (err) {
+        console.error('Failed to fetch subject details', err);
+    }
+
+    const backUrl = subject ? `/courses?view=subjects&id=${subject.semesterId}` : null;
+    const title = subject ? `Select Quiz - ${subject.name}` : 'Select Quiz';
+
     // Render Container Structure
     root.innerHTML = `
     <div class="container mt-4">
-        ${renderHeader('Select Quiz', true)}
+        ${renderHeader(title, true, backUrl)}
         
         <!-- Controls -->
         <div class="card mb-4" style="padding: 1rem; background: #f8fafc;">
