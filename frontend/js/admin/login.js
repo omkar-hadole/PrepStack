@@ -1,4 +1,4 @@
-import api from '/js/api.js';
+import api from '/js/utils/api.js';
 
 export default function renderAdminLogin(params, root) {
     root.innerHTML = `

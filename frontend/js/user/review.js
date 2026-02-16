@@ -1,4 +1,4 @@
-import api from '/js/api.js';
+import api from '/js/utils/api.js';
 
 export default async function renderReview(params, root) {
     const attemptId = params.id;

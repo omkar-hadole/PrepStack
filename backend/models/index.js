@@ -21,6 +21,7 @@ const QuizSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now }
 });
+QuizSchema.index({ subjectId: 1, isActive: 1 });
 
 const QuestionSchema = new mongoose.Schema({
     quizId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz', required: true },
@@ -35,6 +36,7 @@ const QuestionSchema = new mongoose.Schema({
     order: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
+QuestionSchema.index({ quizId: 1, order: 1 });
 
 const AttemptSchema = new mongoose.Schema({
     quizId: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz', required: true },
@@ -45,6 +47,8 @@ const AttemptSchema = new mongoose.Schema({
     score: { type: Number },
     status: { type: String, enum: ['ongoing', 'completed'], default: 'ongoing' }
 });
+AttemptSchema.index({ userId: 1, quizId: 1 }); // For history lookups
+AttemptSchema.index({ quizId: 1 }); // For analytics
 
 const AdminSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
@@ -58,6 +62,7 @@ const UserSchema = new mongoose.Schema({
     googleId: { type: String, unique: true, sparse: true },
     createdAt: { type: Date, default: Date.now }
 });
+UserSchema.index({ email: 1 });
 
 export const Semester = mongoose.model('Semester', SemesterSchema);
 export const Subject = mongoose.model('Subject', SubjectSchema);

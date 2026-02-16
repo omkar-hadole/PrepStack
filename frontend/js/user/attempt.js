@@ -1,4 +1,5 @@
-import api from '/js/api.js';
+import api from '/js/utils/api.js';
+import { LoadingButton } from '/js/components/LoadingButton.js';
 import '../../css/quiz.css'; // Import CSS for Vite bundling
 
 let timerInterval;
@@ -6,11 +7,6 @@ let autosaveInterval;
 
 export default async function renderAttempt(params, root) {
     const quizId = params.id;
-
-
-
-
-
 
     const userStr = localStorage.getItem('prepstack_user');
     const user = userStr ? JSON.parse(userStr) : null;
@@ -28,11 +24,8 @@ export default async function renderAttempt(params, root) {
     root.innerHTML = '<div class="container mt-4">Starting Quiz...</div>';
 
     try {
-
         const data = await api.post('/attempts/start', { quizId, userId });
         const { attemptId, quiz, questions, startTime } = data;
-
-
         renderQuizUI(root, attemptId, quiz, questions, startTime);
 
     } catch (err) {
@@ -41,8 +34,6 @@ export default async function renderAttempt(params, root) {
 }
 
 function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
-
-
     const startTime = new Date(startTimeStr).getTime();
     const durationMs = quizInfo.duration * 60 * 1000;
     const endTime = startTime + durationMs;
@@ -51,9 +42,7 @@ function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
     const reviewStatus = new Set();
     const visited = new Set();
 
-
     initQuizLayout(root, quizInfo, questions, answers, reviewStatus, visited);
-
 
     const updateTimer = () => {
         const now = Date.now();
@@ -76,7 +65,6 @@ function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
     timerInterval = setInterval(updateTimer, 1000);
     updateTimer();
 
-
     autosaveInterval = setInterval(() => {
         if (Object.keys(answers).length > 0) {
             api.put(`/attempts/${attemptId}/autosave`, { answers }).catch(console.error);
@@ -88,6 +76,7 @@ function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
         clearInterval(timerInterval);
         clearInterval(autosaveInterval);
 
+        const submitBtn = document.getElementById('submit-btn');
         if (!auto && !confirm('Are you sure you want to submit?')) {
             timerInterval = setInterval(updateTimer, 1000);
             autosaveInterval = setInterval(() => {
@@ -98,19 +87,16 @@ function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
             return;
         }
 
-        root.innerHTML = '<div class="container mt-4">Submitting answers...</div>';
+        if (submitBtn) LoadingButton.setLoading(submitBtn, true, 'Submitting...');
+
         try {
             const res = await api.post(`/attempts/${attemptId}/submit`, { answers });
             renderResult(root, res, attemptId, quizInfo.subjectId);
         } catch (err) {
+            if (submitBtn) LoadingButton.setLoading(submitBtn, false);
             root.innerHTML = `<div class="container margin-top"><p style="color:red">Submission Failed: ${err.message}</p> <button class="btn btn-secondary" onclick="window.location.reload()">Retry</button></div>`;
         }
     }
-
-
-
-
-
 
     const submitBtn = document.getElementById('submit-btn');
     if (submitBtn) submitBtn.onclick = () => submitQuiz(false);

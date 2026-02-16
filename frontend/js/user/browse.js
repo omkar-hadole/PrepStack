@@ -1,4 +1,5 @@
-import api from '/js/api.js';
+import api from '/js/utils/api.js';
+import { Cache } from '/js/utils/cache.js';
 
 const QUIZZES_PER_PAGE = 6;
 
@@ -6,19 +7,40 @@ export default async function renderBrowse(params, root) {
     const view = new URLSearchParams(window.location.search).get('view') || 'semesters';
     const id = new URLSearchParams(window.location.search).get('id');
 
-
     if (!window.currentQuizPage) window.currentQuizPage = 1;
 
+    // Helper for Stale-While-Revalidate
+    const fetchWithCache = async (key, endpoint, renderFn) => {
+        const cached = Cache.get(key);
+        if (cached) {
+            console.log(`[Cache Hit] Rendering ${key} instantly`);
+            renderFn(root, cached);
+        } else {
+            root.innerHTML = '<div class="container mt-4">Loading...</div>';
+        }
 
-    root.innerHTML = '<div class="container mt-4">Loading...</div>';
+        try {
+            const data = await api.get(endpoint);
+            // Only re-render if data changed or wasn't cached
+            if (JSON.stringify(data) !== JSON.stringify(cached)) {
+                console.log(`[Network] Updating ${key}`);
+                Cache.set(key, data, 5); // 5 min TTL
+                renderFn(root, data);
+            }
+        } catch (err) {
+            if (!cached) {
+                root.innerHTML = `<div class="container mt-4"><div class="alert alert-danger">${err.message}</div></div>`;
+            } else {
+                console.error('Background fetch failed, keeping cached data', err);
+            }
+        }
+    };
 
     try {
         if (view === 'semesters') {
-            const semesters = await api.get('/semesters');
-            renderSemesters(root, semesters);
+            await fetchWithCache('semesters', '/semesters', renderSemesters);
         } else if (view === 'subjects' && id) {
-            const subjects = await api.get(`/subjects?semesterId=${id}`);
-            renderSubjects(root, subjects);
+            await fetchWithCache(`subjects_${id}`, `/subjects?semesterId=${id}`, renderSubjects);
         } else if (view === 'quizzes' && id) {
             renderQuizzesWithControls(root, id);
         }

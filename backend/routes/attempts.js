@@ -105,7 +105,11 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/history/:userId', async (req, res) => {
-    const attempts = await Attempt.find({ userId: req.params.userId }).populate('quizId');
+    // Optimization: lean() for faster read, sort by latest first
+    const attempts = await Attempt.find({ userId: req.params.userId })
+        .sort({ startTime: -1 })
+        .populate('quizId')
+        .lean();
     res.json(attempts);
 });
 

@@ -1,10 +1,31 @@
 import Router from '/js/router.js';
-import renderAdminLogin from '/js/admin/login.js';
+import { ProgressBar } from '/js/components/ProgressBar.js';
 
-
-
+// Helper for lazy loading modules with progress bar
+const lazyLoad = async (importFunc) => {
+    ProgressBar.start();
+    try {
+        const module = await importFunc();
+        ProgressBar.finish();
+        return module;
+    } catch (error) {
+        ProgressBar.finish();
+        console.error('Failed to load module:', error);
+        document.getElementById('app').innerHTML = `
+            <div class="container text-center mt-4">
+                <div class="alert alert-danger">
+                    Failed to load content. Please check your connection and reload.
+                </div>
+                <button class="btn btn-primary" onclick="window.location.reload()">Reload</button>
+            </div>
+        `;
+        throw error;
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
+    ProgressBar.init();
+
     const routes = {
         '/': (params, root) => {
             root.innerHTML = `
@@ -18,54 +39,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         },
-        '/admin': renderAdminLogin,
+        '/admin': (params, root) => {
+            lazyLoad(() => import('/js/admin/login.js')).then(module => module.default(params, root));
+        },
         '/admin/dashboard': (params, root) => {
-            
-            import('/js/admin/dashboard.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/admin/dashboard.js')).then(module => module.default(params, root));
         },
         '/admin/quiz/:id': (params, root) => {
-            import('/js/admin/quizDetails.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/admin/quizDetails.js')).then(module => module.default(params, root));
         },
         '/login': (params, root) => {
-            import('/js/user/auth.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/user/auth.js')).then(module => module.default(params, root));
         },
         '/register': (params, root) => {
-            import('/js/user/auth.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/user/auth.js')).then(module => module.default(params, root));
         },
         '/courses': (params, root) => {
             if (!localStorage.getItem('prepstack_token')) {
                 window.router.navigate('/login');
                 return;
             }
-            import('/js/user/browse.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/user/browse.js')).then(module => module.default(params, root));
         },
         '/attempt/:id': (params, root) => {
             if (!localStorage.getItem('prepstack_token')) {
                 window.router.navigate('/login');
                 return;
             }
-            import('/js/user/attempt.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/user/attempt.js')).then(module => module.default(params, root));
         },
         '/review/:id': (params, root) => {
             if (!localStorage.getItem('prepstack_token')) {
                 window.router.navigate('/login');
                 return;
             }
-            import('/js/user/review.js').then(module => {
-                module.default(params, root);
-            });
+            lazyLoad(() => import('/js/user/review.js')).then(module => module.default(params, root));
         }
     };
 

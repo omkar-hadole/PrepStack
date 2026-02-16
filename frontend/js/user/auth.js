@@ -1,4 +1,5 @@
-import api from '/js/api.js';
+import api from '/js/utils/api.js';
+import { LoadingButton } from '/js/components/LoadingButton.js';
 
 export default function renderAuth(params, root) {
     const isRegister = window.location.pathname === '/register';
@@ -26,7 +27,7 @@ export default function renderAuth(params, root) {
                         <input type="password" id="password" class="form-control" required placeholder="••••••••">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%;">
                         ${isRegister ? 'Sign Up' : 'Log In'}
                     </button>
 
@@ -93,14 +94,13 @@ export default function renderAuth(params, root) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const name = isRegister ? document.getElementById('name').value : undefined;
+        const submitBtn = document.getElementById('auth-submit-btn');
+
+        LoadingButton.setLoading(submitBtn, true);
 
         try {
             const endpoint = isRegister ? '/auth/register' : '/auth/user/login';
             const payload = isRegister ? { name, email, password } : { email, password };
-
-            console.log('ENV VITE_API_URL:', import.meta.env.VITE_API_URL);
-            console.log('LOGIN URL:', `${import.meta.env.VITE_API_URL}/api${endpoint}`);
-            console.log('Payload:', payload);
 
             const data = await api.post(endpoint, payload);
 
@@ -109,6 +109,7 @@ export default function renderAuth(params, root) {
 
             window.router.navigate('/courses');
         } catch (err) {
+            LoadingButton.setLoading(submitBtn, false);
             alert(err.message || 'Authentication failed');
         }
     };
