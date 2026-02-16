@@ -38,6 +38,28 @@ router.post('/:id/submit', async (req, res) => {
     res.json(attempt);
 });
 
+router.get('/:id', async (req, res) => {
+    try {
+        const attempt = await Attempt.findById(req.params.id).populate('quizId').lean();
+        if (!attempt) return res.status(404).json({ error: 'Attempt not found' });
+
+        const questions = await mongoose.model('Question').find({ quizId: attempt.quizId._id }).sort({ order: 1 }).lean();
+
+        // Attach user answers to questions for the frontend
+        const questionsWithAnswers = questions.map(q => ({
+            ...q,
+            userAnswer: attempt.answers[q._id.toString()]
+        }));
+
+        res.json({
+            ...attempt,
+            questions: questionsWithAnswers
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.get('/history/:userId', async (req, res) => {
     const attempts = await Attempt.find({ userId: req.params.userId }).populate('quizId');
     res.json(attempts);

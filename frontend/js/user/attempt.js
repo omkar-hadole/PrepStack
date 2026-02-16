@@ -1,4 +1,5 @@
 import api from '/js/api.js';
+import '../../css/quiz.css'; // Import CSS for Vite bundling
 
 let timerInterval;
 let autosaveInterval;
@@ -40,14 +41,6 @@ export default async function renderAttempt(params, root) {
 }
 
 function renderQuizUI(root, attemptId, quizInfo, questions, startTimeStr) {
-
-    if (!document.getElementById('quiz-styles')) {
-        const link = document.createElement('link');
-        link.id = 'quiz-styles';
-        link.rel = 'stylesheet';
-        link.href = '/css/quiz.css';
-        document.head.appendChild(link);
-    }
 
 
     const startTime = new Date(startTimeStr).getTime();
