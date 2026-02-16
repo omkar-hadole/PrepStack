@@ -14,7 +14,7 @@ export default async function renderReview(params, root) {
                         <h2>Review Results</h2>
                         <h4 class="text-muted">Score: ${attempt.score} / ${attempt.questions.length} (${((attempt.score / attempt.questions.length) * 100).toFixed(0)}%)</h4>
                     </div>
-                    <a href="/courses" class="btn btn-primary" data-link>Done</a>
+                    <button class="btn btn-primary" onclick="window.router.navigate('/courses?view=quizzes&id=${attempt.quizId.subjectId}')">Done</button>
                 </header>
                 
                 <div style="display: flex; flex-direction: column; gap: 2rem; padding-bottom: 4rem;">
@@ -33,7 +33,7 @@ export default async function renderReview(params, root) {
                                     ${q.options.map((opt, idx) => {
                 let style = 'padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; border: 1px solid transparent; transition: all 0.2s;';
 
-                
+
                 const isSelected = isSelectedOption(q, q.userAnswer, idx);
                 const isCorrectOpt = isSelectedOption(q, q.correctAnswer, idx);
 
