@@ -111,6 +111,12 @@ router.get('/quizzes', async (req, res) => {
             .limit(Number(limit))
             .lean();
 
+        // Populate question count for each quiz
+        quizzes = await Promise.all(quizzes.map(async (quiz) => {
+            const totalQuestions = await mongoose.model('Question').countDocuments({ quizId: quiz._id });
+            return { ...quiz, totalQuestions };
+        }));
+
         // If userId provided, check attempts (optional, logic kept from original if needed)
         // ... (Attempt logic from original file omitted for brevity unless specificied to keep exactly)
         // Assuming original logic was simple enough. 
