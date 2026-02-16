@@ -34,9 +34,9 @@ connectDB();
 
 // Mount Routes EXACTLY
 app.use("/api/auth", authRoutes);
+app.use("/api/attempts", attemptRoutes);
+app.use("/api", questionsRoutes); // Mount before hierarchy to handle /quizzes/:id/questions
 app.use("/api", hierarchyRoutes);
-app.use("/api", questionsRoutes);
-app.use("/api", attemptRoutes);
 
 // Test Route
 app.get("/api/test", async (req, res) => {
