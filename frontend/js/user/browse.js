@@ -190,10 +190,33 @@ async function renderQuizzesWithControls(root, subjectId) {
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <span class="badge" style="display: ${item.isAttempted ? 'inline-flex' : 'none'}; align-items: center; gap: 0.25rem; background: #ecfdf5; color: #047857; padding: 0.5rem 0.75rem; border-radius: 99px; font-size: 0.85rem; font-weight: 500; border: 1px solid #a7f3d0;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                Solved (${item.latestScore}/${item.totalQuestions})
-                            </span>
+                            ${(() => {
+                if (!item.isAttempted) return '';
+                const score = item.latestScore || 0;
+                const total = item.totalQuestions || 1; // avoid division by zero
+                const percentage = (score / total) * 100;
+
+                let style = 'display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 0.75rem; border-radius: 99px; font-size: 0.85rem; font-weight: 500; border: 1px solid;';
+                let iconColor = 'currentColor';
+
+                if (percentage > 80) {
+                    style += ' background: #ecfdf5; color: #047857; border-color: #a7f3d0;'; // Green
+                    iconColor = '#047857';
+                } else if (percentage > 40) {
+                    style += ' background: #fffbeb; color: #b45309; border-color: #fcd34d;'; // Orange
+                    iconColor = '#b45309';
+                } else {
+                    style += ' background: #fef2f2; color: #b91c1c; border-color: #fecaca;'; // Red
+                    iconColor = '#b91c1c';
+                }
+
+                return `
+                                    <span class="badge" style="${style}">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                        Solved (${score}/${item.totalQuestions})
+                                    </span>
+                                `;
+            })()}
                             
                             ${item.isAttempted && item.lastAttemptId ?
                 `<button class="btn btn-secondary" onclick="window.router.navigate('/review/${item.lastAttemptId}')">Review</button>`
